@@ -36,6 +36,7 @@
                     {
                         var firstDigit = FindFirstDigit(line, NumberWords);
                         var lastDigit = FindFirstDigit(Reverse(line), ReverseNumberWords);
+                        //var lastDigit = FindFirstDigit(Reverse(line), NumberWords.Select(nw => Reverse(nw)).ToList());
 
                         count = count + int.Parse(firstDigit + lastDigit);
                     }
@@ -79,7 +80,6 @@
         private const string Seven = "seven";
         private const string Eight = "eight";
         private const string Nine = "nine";
-
         private const string ReverseZero = "orez";
         private const string ReverseOne = "eno";
         private const string ReverseTwo = "owt";
