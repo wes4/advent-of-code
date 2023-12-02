@@ -51,6 +51,7 @@
             }
 
             return count;
+            //54390
         }
 
         public static int Part2()
@@ -70,6 +71,7 @@
             }
 
             return count;
+            //54277
         }
 
         private static string FindFirstDigit(string line, List<string> numberWords)

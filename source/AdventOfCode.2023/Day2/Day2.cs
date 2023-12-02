@@ -23,22 +23,17 @@ namespace AdventOfCode._2023.Day2
             string line;
             while ((line = streamReader.ReadLine()) != null)
             {
-                var gameIdMatchString = GameIdFilter.Match(line).ToString();
-                var gameId = int.Parse(gameIdMatchString.Substring(0, gameIdMatchString.Length - 1));
-
-                var presentRedCubes = GetCubeCountsFromMatches(RedFilter.Matches(line)).Max();
-                var presentGreenCubes = GetCubeCountsFromMatches(GreenFilter.Matches(line)).Max();
-                var presentBlueCubes = GetCubeCountsFromMatches(BlueFilter.Matches(line)).Max();
-
-                if (PresentCubeCountIsValid(presentRedCubes, MaximumNumberOfRedCubes) 
-                    && PresentCubeCountIsValid(presentGreenCubes, MaximumNumberOfGreenCubes) 
-                    && PresentCubeCountIsValid(presentBlueCubes, MaximumNumberOfBlueCubes))
+                if (PresentCubeCountIsValid(GetCubeCountsFromMatches(RedFilter.Matches(line)).Max(), MaximumNumberOfRedCubes)
+                    && PresentCubeCountIsValid(GetCubeCountsFromMatches(GreenFilter.Matches(line)).Max(), MaximumNumberOfGreenCubes)
+                    && PresentCubeCountIsValid(GetCubeCountsFromMatches(BlueFilter.Matches(line)).Max(), MaximumNumberOfBlueCubes))
                 {
-                    possibleGames += gameId;
+                    var gameIdMatchString = GameIdFilter.Match(line).ToString();
+                    possibleGames += int.Parse(gameIdMatchString.Substring(0, gameIdMatchString.Length - 1)); ;
                 }
             }
 
             return possibleGames;
+            // 2006
         }
 
         public static int Part2()
@@ -58,6 +53,7 @@ namespace AdventOfCode._2023.Day2
             }
 
             return gamePowerSum;
+            //84911
         }
 
         private static IEnumerable<int> GetCubeCountsFromMatches(IEnumerable<Match> matches)
@@ -65,9 +61,9 @@ namespace AdventOfCode._2023.Day2
             return matches.Select(m => int.Parse(m.ToString().Substring(0, m.Length - 2)));
         }
 
-        private static bool PresentCubeCountIsValid(int numberOfCubesPresent, int maximumNumberOfCubes)
+        private static bool PresentCubeCountIsValid(int maximumNumberOfCubesPresent, int maximumNumberOfCubes)
         {
-            if (numberOfCubesPresent >= maximumNumberOfCubes)
+            if (maximumNumberOfCubes >= maximumNumberOfCubesPresent)
             {
                 return true;
             }
