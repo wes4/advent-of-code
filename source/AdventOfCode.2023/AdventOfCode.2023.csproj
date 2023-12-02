@@ -14,13 +14,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="Day1-Data.txt">
+    <Content Include="Day1\Day1-Data.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Day2-Data.txt">
+    <Content Include="Day2\Day2-Data.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Day2-TestData.txt">
+    <Content Include="Day2\Day2-TestData.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

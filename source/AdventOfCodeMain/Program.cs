@@ -1,6 +1,3 @@
-﻿using AdventOfCode._2023;
+﻿using AdventOfCode._2023.Day1;
 
-var result = Day1.Part1();
-//var result = Day1.Part2();
-//var result = Day2.Part1();
-//var result = Day2.Part2();
+// run methods here

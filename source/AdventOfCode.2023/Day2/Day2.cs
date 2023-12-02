@@ -1,6 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 
-namespace AdventOfCode._2023
+namespace AdventOfCode._2023.Day2
 {
     public static class Day2
     {
@@ -55,14 +55,14 @@ namespace AdventOfCode._2023
 
                     while ((line = streamReader.ReadLine()) != null)
                     {
-                        gamePowerSum += 
-                            RedFilter.Matches(line).Select(m => int.Parse(m.ToString().Substring(0, m.Length - 2))).Max() 
+                        gamePowerSum +=
+                            RedFilter.Matches(line).Select(m => int.Parse(m.ToString().Substring(0, m.Length - 2))).Max()
                             * GreenFilter.Matches(line).Select(m => int.Parse(m.ToString().Substring(0, m.Length - 2))).Max()
                             * BlueFilter.Matches(line).Select(m => int.Parse(m.ToString().Substring(0, m.Length - 2))).Max();
                     }
                 }
             }
-            
+
             return gamePowerSum;
         }
     }

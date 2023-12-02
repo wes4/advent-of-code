@@ -1,4 +1,4 @@
-﻿namespace AdventOfCode._2023
+﻿namespace AdventOfCode._2023.Day1
 {
     public static class Day1
     {
@@ -12,7 +12,7 @@
                 {
                     string line;
 
-                    while((line = streamReader.ReadLine()) != null)
+                    while ((line = streamReader.ReadLine()) != null)
                     {
                         count = count + int.Parse(line.FirstOrDefault(c => char.IsDigit(c)).ToString() + line.LastOrDefault(c => char.IsDigit(c)).ToString());
                     }
@@ -35,8 +35,7 @@
                     while ((line = streamReader.ReadLine()) != null)
                     {
                         var firstDigit = FindFirstDigit(line, NumberWords);
-                        var lastDigit = FindFirstDigit(Reverse(line), ReverseNumberWords);
-                        //var lastDigit = FindFirstDigit(Reverse(line), NumberWords.Select(nw => Reverse(nw)).ToList());
+                        var lastDigit = FindFirstDigit(Reverse(line), NumberWords.Select(nw => Reverse(nw)).ToList());
 
                         count = count + int.Parse(firstDigit + lastDigit);
                     }
@@ -103,20 +102,6 @@
             Seven,
             Eight,
             Nine,
-        };
-
-        private static List<string> ReverseNumberWords = new List<string>
-        {
-            ReverseZero,
-            ReverseOne,
-            ReverseTwo,
-            ReverseThree,
-            ReverseFour,
-            ReverseFive,
-            ReverseSix,
-            ReverseSeven,
-            ReverseEight,
-            ReverseNine,
         };
 
         private static string ConvertNumberWordToNumberString(string s)
