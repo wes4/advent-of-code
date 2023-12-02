@@ -47,7 +47,7 @@
             string line;
             while ((line = streamReader.ReadLine()) != null)
             {
-                count = count + int.Parse(line.FirstOrDefault(c => char.IsDigit(c)).ToString() + line.LastOrDefault(c => char.IsDigit(c)).ToString());
+                count += int.Parse(line.FirstOrDefault(c => char.IsDigit(c)).ToString() + line.LastOrDefault(c => char.IsDigit(c)).ToString());
             }
 
             return count;
@@ -66,7 +66,7 @@
                 var firstDigit = FindFirstDigit(line, NumberWords);
                 var lastDigit = FindFirstDigit(Reverse(line), NumberWords.Select(nw => Reverse(nw)).ToList());
 
-                count = count + int.Parse(firstDigit + lastDigit);
+                count += int.Parse(firstDigit + lastDigit);
             }
 
             return count;
