@@ -202,27 +202,27 @@
                 }
             }
         }
-    }
 
-    public class SymbolIndex
-    {
-        public int[,] Mask { get; set; }
-
-        public int X { get; set; }
-
-        public int Y { get; set; }
-
-        public int MaxHeight { get; set; }
-
-        public int MaxWidth { get; set; }
-
-        public SymbolIndex(int[,] mask, int x, int y, int maxHeight, int maxWidth) 
+        private class SymbolIndex
         {
-            Mask = mask;
-            X = x;
-            Y = y;
-            MaxHeight = maxHeight;
-            MaxWidth = maxWidth;
+            public int[,] Mask { get; set; }
+
+            public int X { get; set; }
+
+            public int Y { get; set; }
+
+            public int MaxHeight { get; set; }
+
+            public int MaxWidth { get; set; }
+
+            public SymbolIndex(int[,] mask, int x, int y, int maxHeight, int maxWidth)
+            {
+                Mask = mask;
+                X = x;
+                Y = y;
+                MaxHeight = maxHeight;
+                MaxWidth = maxWidth;
+            }
         }
     }
 }
