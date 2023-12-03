@@ -1,355 +1,228 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-
-namespace AdventOfCode._2023.Day3
+﻿namespace AdventOfCode._2023.Day3
 {
     public static class Day3
     {
-        private const char Default = '.';
-
         public static int Part1()
         {
-            using var fileStream = File.OpenRead(@".\Day3\Day3-Data.txt");
-            using var streamReader = new StreamReader(fileStream);
+            var input = File.ReadAllText(@".\Day3\Day3-Data.txt");
 
-            var charLines = new List<List<char>>();
-            var numberMask = new List<List<long>>();
+            var arrays = CreateSchematicAndMask(input);
 
-            int partSum = 0;
-
-            string line;
-            while ((line = streamReader.ReadLine()) != null)
-            {
-                var chars = line.ToCharArray().ToList();
-                charLines.Add(chars);
-
-                var numberMaskRow = new long[chars.Count()];
-                numberMask.Add(numberMaskRow.ToList());
-            }
-
-            char[][] engineSchematic = charLines.Select(charLine => charLine.ToArray()).ToArray();
-            long[][] mask = numberMask.Select(x => x.ToArray()).ToArray();
-
-            var height = engineSchematic.Length;
-            var width = engineSchematic[0].Length;
-
-            for (int x = 0; x < height; x += 1)
-            {
-                var indexesToUpdate = new List<(int x, int y)>();
-                var currentNumberString = string.Empty;
-                bool currentlyCapturingNumber = false;
-
-                for (int y = 0; y < width; y += 1)
-                {
-                    if (char.IsDigit(engineSchematic[x][y]))
-                    {
-                        indexesToUpdate.Add((x, y));
-                        currentNumberString = currentNumberString + engineSchematic[x][y];
-                        currentlyCapturingNumber = true;
-                    }
-
-                    if ((!char.IsDigit(engineSchematic[x][y]) && currentlyCapturingNumber) || (y + 1 == width && currentlyCapturingNumber))
-                    {
-                        UpdateIndexes(mask, long.Parse(currentNumberString), indexesToUpdate);
-                        currentlyCapturingNumber = false;
-                        currentNumberString = string.Empty;
-                        indexesToUpdate.Clear();
-                    }
-                }
-
-            }
-
-            for (int x = 0; x < height; x += 1)
-            {
-                for (int y = 0; y < width; y += 1)
-                {
-                    var currentValue = engineSchematic[x][y];
-                    if (currentValue != Default)
-                    {
-                        if (!char.IsDigit(currentValue) && !char.IsLetter(currentValue))
-                        {
-                            var localSum = CalculateLocalSum(mask, x, y, height, width);
-
-                            partSum += localSum;
-                        }
-                    }
-                }
-            }
-
-            return partSum;
+            return FindSymbolsAndPerformFunctionOnSurroundingValues(arrays.engineSchematic, arrays.mask, CalculateLocalSum);
             // 527364
         }
 
         public static int Part2()
         {
-            using var fileStream = File.OpenRead(@".\Day3\Day3-Data.txt");
-            using var streamReader = new StreamReader(fileStream);
+            var input = File.ReadAllText(@".\Day3\Day3-Data.txt");
 
-            var charLines = new List<List<char>>();
-            var numberMask = new List<List<long>>();
+            var arrays = CreateSchematicAndMask(input);
 
-            int gearRatioSum = 0;
+            return FindSymbolsAndPerformFunctionOnSurroundingValues(arrays.engineSchematic, arrays.mask, CalculateGearRatio);
+            // 79026871
+        }
 
-            string line;
-            while ((line = streamReader.ReadLine()) != null)
-            {
-                var chars = line.ToCharArray().ToList();
-                charLines.Add(chars);
+        private static int FindSymbolsAndPerformFunctionOnSurroundingValues(char[,] engineSchematic, int[,] mask, Func<SymbolIndex, int> function)
+        {
+            var sum = 0;
 
-                var numberMaskRow = new long[chars.Count()];
-                numberMask.Add(numberMaskRow.ToList());
-            }
-
-            char[][] engineSchematic = charLines.Select(charLine => charLine.ToArray()).ToArray();
-            long[][] mask = numberMask.Select(x => x.ToArray()).ToArray();
-
-            var height = engineSchematic.Length;
-            var width = engineSchematic[0].Length;
+            var height = engineSchematic.GetLength(0);
+            var width = engineSchematic.GetLength(1);
 
             for (int x = 0; x < height; x += 1)
+            {
+                for (int y = 0; y < width; y += 1)
+                {
+                    var currentValue = engineSchematic[x, y];
+                    if (currentValue != '.'
+                        && !char.IsDigit(currentValue)
+                        && !char.IsLetter(currentValue))
+                    {
+                        var symbolIndex = new SymbolIndex(mask, x, y, height, width);
+                        var value = function(symbolIndex);
+
+                        sum += value;
+                    }
+                }
+            }
+
+            return sum;
+        }
+
+        private static (char[,] engineSchematic, int[,] mask) CreateSchematicAndMask(string input)
+        {
+            var lines = input.Split('\n');
+            var height = lines.Length;
+            var width = lines[0].Length - 1; // lazy handling of not including newline characters
+
+            int x = 0, y = 0;
+            char[,] engineSchematic = new char[height, width];
+            int[,] mask = new int[height, width];
+            foreach (var row in input.Split('\n'))
             {
                 var indexesToUpdate = new List<(int x, int y)>();
                 var currentNumberString = string.Empty;
                 bool currentlyCapturingNumber = false;
+                var trimmedRow = row.Trim().ToCharArray();
 
-                for (int y = 0; y < width; y += 1)
+                y = 0;
+                foreach (var col in trimmedRow)
                 {
-                    if (char.IsDigit(engineSchematic[x][y]))
+                    engineSchematic[x, y] = col;
+
+                    if (char.IsDigit(engineSchematic[x, y]))
                     {
                         indexesToUpdate.Add((x, y));
-                        currentNumberString = currentNumberString + engineSchematic[x][y];
+                        currentNumberString = currentNumberString + engineSchematic[x, y];
                         currentlyCapturingNumber = true;
                     }
 
-                    if ((!char.IsDigit(engineSchematic[x][y]) && currentlyCapturingNumber) || (y + 1 == width && currentlyCapturingNumber))
+                    if ((!char.IsDigit(engineSchematic[x, y]) && currentlyCapturingNumber) || (y + 1 == width && currentlyCapturingNumber))
                     {
-                        UpdateIndexes(mask, long.Parse(currentNumberString), indexesToUpdate);
+                        PopulateMaskIndexesWithValue(mask, int.Parse(currentNumberString), indexesToUpdate);
                         currentlyCapturingNumber = false;
                         currentNumberString = string.Empty;
                         indexesToUpdate.Clear();
                     }
-                }
 
+                    y++;
+                }
+                x++;
             }
 
-            for (int x = 0; x < height; x += 1)
-            {
-                for (int y = 0; y < width; y += 1)
-                {
-                    var currentValue = engineSchematic[x][y];
-                    if (currentValue != Default)
-                    {
-                        if (!char.IsDigit(currentValue) && !char.IsLetter(currentValue))
-                        {
-                            var localGearRatioSum = CalculateGearRatio(mask, x, y, height, width);
-
-                            gearRatioSum += localGearRatioSum;
-                        }
-                    }
-                }
-            }
-
-            return gearRatioSum;
+            return (engineSchematic, mask);
         }
 
-        private static void UpdateIndexes(long[][] mask, long value, List<(int x, int y)> indexesToUpdate)
+        private static void PopulateMaskIndexesWithValue(int[,] mask, int value, List<(int x, int y)> indexesToUpdate)
         {
             foreach (var index in indexesToUpdate)
             {
-                mask[index.x][index.y] = value;
+                mask[index.x, index.y] = value;
             }
         }
 
-        private static int CalculateGearRatio(long[][] mask, int height, int width, int maxHeight, int maxWidth)
+        private static int CalculateLocalSum(SymbolIndex symbolIndex)
         {
-            var gearRatio = 1;
+            int localSum = 0;
+
+            var height = symbolIndex.Height;
+            var width = symbolIndex.Width;
+            var maxHeight = symbolIndex.MaxHeight;
+            var maxWidth = symbolIndex.MaxWidth;
+            int[,] mask = symbolIndex.Mask;
+
+            var leftIndex = width - 1 >= 0 ? width - 1 : 0;
+            var rightIndex = width + 1 <= maxWidth ? width + 1 : 0;
+
+            var upIndex = height - 1 >= 0 ? height - 1 : 0;
+            var downIndex = height + 1 <= maxHeight ? height + 1 : 0;
+
+            localSum += GetMaskIndexValueAndRemoveUsedValues(upIndex, leftIndex, mask);
+            localSum += GetMaskIndexValueAndRemoveUsedValues(upIndex, width, mask);
+            localSum += GetMaskIndexValueAndRemoveUsedValues(upIndex, rightIndex, mask);
+            localSum += GetMaskIndexValueAndRemoveUsedValues(height, rightIndex, mask);
+            localSum += GetMaskIndexValueAndRemoveUsedValues(downIndex, rightIndex, mask);
+            localSum += GetMaskIndexValueAndRemoveUsedValues(downIndex, width, mask);
+            localSum += GetMaskIndexValueAndRemoveUsedValues(downIndex, leftIndex, mask);
+            localSum += GetMaskIndexValueAndRemoveUsedValues(height, leftIndex, mask);
+
+            return localSum;
+        }
+
+        private static int CalculateGearRatio(SymbolIndex symbolIndex)
+        {
+            int localSum = 0;
+
+            var height = symbolIndex.Height;
+            var width = symbolIndex.Width;
+            var maxHeight = symbolIndex.MaxHeight;
+            var maxWidth = symbolIndex.MaxWidth;
+            int[,] mask = symbolIndex.Mask;
+
+            var leftIndex = width - 1 >= 0 ? width - 1 : 0;
+            var rightIndex = width + 1 <= maxWidth ? width + 1 : 0;
+
+            var upIndex = height - 1 >= 0 ? height - 1 : 0;
+            var downIndex = height + 1 <= maxHeight ? height + 1 : 0;
+
+            var upperLeftValue = GetMaskIndexValueAndRemoveUsedValues(upIndex, leftIndex, mask);
+            var upperValue = GetMaskIndexValueAndRemoveUsedValues(upIndex, width, mask);
+            var upperRightValue = GetMaskIndexValueAndRemoveUsedValues(upIndex, rightIndex, mask);
+            var rightValue = GetMaskIndexValueAndRemoveUsedValues(height, rightIndex, mask);
+            var lowerRightValue = GetMaskIndexValueAndRemoveUsedValues(downIndex, rightIndex, mask);
+            var lowerValue = GetMaskIndexValueAndRemoveUsedValues(downIndex, width, mask);
+            var lowerLeftValue = GetMaskIndexValueAndRemoveUsedValues(downIndex, leftIndex, mask);
+            var leftValue = GetMaskIndexValueAndRemoveUsedValues(height, leftIndex, mask);
+
+            var values = new List<int> { upperLeftValue, upperValue, upperRightValue, rightValue, lowerRightValue, lowerValue, lowerLeftValue, leftValue };
+
             var gearCount = 0;
-
-            var leftIndex = width - 1;
-            if (leftIndex >= 0)
+            var gearRatio = 1;
+            foreach (var value in values.Where(v => v > 0))
             {
-                var leftIndexValue = mask[height][leftIndex];
-                if (int.Parse(leftIndexValue.ToString()) != 0)
-                {
-                    gearCount += 1;
-                    gearRatio *= int.Parse(leftIndexValue.ToString());
-                }
-                RemoveUsedValue(height, leftIndex, mask);
-
-                var previousRowValue = height - 1;
-                if (previousRowValue >= 0)
-                {
-                    var upperLefttValue = mask[previousRowValue][leftIndex];
-                    if (int.Parse(upperLefttValue.ToString()) != 0)
-                    {
-                        gearCount += 1;
-                        gearRatio *= int.Parse(upperLefttValue.ToString());
-                    }
-                    RemoveUsedValue(previousRowValue, leftIndex, mask);
-
-                    var upperValue = mask[previousRowValue][width];
-                    if (int.Parse(upperValue.ToString()) != 0)
-                    {
-                        gearCount += 1;
-                        gearRatio *= int.Parse(upperValue.ToString());
-                    }
-                    RemoveUsedValue(previousRowValue, width, mask);
-                }
-
-                var nextRowValue = height + 1;
-                if (nextRowValue <= maxHeight)
-                {
-                    var lowerLeftValue = mask[nextRowValue][leftIndex];
-                    if (int.Parse(lowerLeftValue.ToString()) != 0)
-                    {
-                        gearCount += 1;
-                        gearRatio *= int.Parse(lowerLeftValue.ToString());
-                    }
-                    RemoveUsedValue(nextRowValue, leftIndex, mask);
-
-                    var lowerValue = mask[nextRowValue][width];
-                    if (int.Parse(lowerValue.ToString()) != 0)
-                    {
-                        gearCount += 1;
-                        gearRatio *= int.Parse(lowerValue.ToString());
-                    }
-                    RemoveUsedValue(nextRowValue, width, mask);
-                }
-            }
-
-            var rightIndex = width + 1;
-            if (rightIndex <= maxWidth)
-            {
-                var rightIndexValue = mask[height][rightIndex];
-                if (int.Parse(rightIndexValue.ToString()) != 0)
-                {
-                    gearCount += 1;
-                    gearRatio *= int.Parse(rightIndexValue.ToString());
-                }
-                RemoveUsedValue(height, rightIndex, mask);
-
-                var previousRowValue = height - 1;
-                if (previousRowValue >= 0)
-                {
-                    var upperRightValue = mask[previousRowValue][rightIndex];
-                    if (int.Parse(upperRightValue.ToString()) != 0)
-                    {
-                        gearCount += 1;
-                        gearRatio *= int.Parse(upperRightValue.ToString());
-                    }
-                    RemoveUsedValue(previousRowValue, rightIndex, mask);
-                }
-
-                var nextRowValue = height + 1;
-                if (nextRowValue <= maxHeight)
-                {
-                    var lowerRightValue = mask[nextRowValue][rightIndex];
-                    if (int.Parse(lowerRightValue.ToString()) != 0)
-                    {
-                        gearCount += 1;
-                        gearRatio *= int.Parse(lowerRightValue.ToString());
-                    }
-                    RemoveUsedValue(nextRowValue, rightIndex, mask);
-                }
+                gearCount += 1;
+                gearRatio *= value;
             }
 
             return gearCount == 2 ? gearRatio : 0;
         }
 
-        private static int CalculateLocalSum(long[][] mask, int height, int width, int maxHeight, int maxWidth)
+        private static int GetMaskIndexValueAndRemoveUsedValues(int x, int y, int[,] mask)
         {
-            var localSum = 0;
+            var value = mask[x, y];
+            RemoveUsedValueFromMask(x, y, mask);
 
-            var leftIndex = width - 1;
-            if (leftIndex >= 0)
-            {
-                var leftIndexValue = mask[height][leftIndex];
-                localSum += int.Parse(leftIndexValue.ToString());
-                RemoveUsedValue(height, leftIndex, mask);
-
-                var previousRowValue = height - 1;
-                if (previousRowValue >= 0)
-                {
-                    var upperLefttValue = mask[previousRowValue][leftIndex];
-                    localSum += int.Parse(upperLefttValue.ToString());
-                    RemoveUsedValue(previousRowValue, leftIndex, mask);
-
-                    var upperValue = mask[previousRowValue][width];
-                    localSum += int.Parse(upperValue.ToString());
-                    RemoveUsedValue(previousRowValue, width, mask);
-                }
-
-                var nextRowValue = height + 1;
-                if (nextRowValue <= maxHeight)
-                {
-                    var lowerLeftValue = mask[nextRowValue][leftIndex];
-                    localSum += int.Parse(lowerLeftValue.ToString());
-                    RemoveUsedValue(nextRowValue, leftIndex, mask);
-
-                    var lowerValue = mask[nextRowValue][width];
-                    localSum += int.Parse(lowerValue.ToString());
-                    RemoveUsedValue(nextRowValue, width, mask);
-                }
-            }
-
-            var rightIndex = width + 1;
-            if (rightIndex <= maxWidth)
-            {
-                var rightIndexValue = mask[height][rightIndex];
-                localSum += int.Parse(rightIndexValue.ToString());
-                RemoveUsedValue(height, rightIndex, mask);
-
-                var previousRowValue = height - 1;
-                if (previousRowValue >= 0)
-                {
-                    var upperRightValue = mask[previousRowValue][rightIndex];
-                    localSum += int.Parse(upperRightValue.ToString());
-                    RemoveUsedValue(previousRowValue, rightIndex, mask);
-                }
-
-                var nextRowValue = height + 1;
-                if (nextRowValue <= maxHeight)
-                {
-                    var lowerRightValue = mask[nextRowValue][rightIndex];
-                    localSum += int.Parse(lowerRightValue.ToString());
-                    RemoveUsedValue(nextRowValue, rightIndex, mask);
-                }
-            }
-
-            return localSum;
+            return value;
         }
 
-        private static void RemoveUsedValue(int x, int y, long[][] mask)
+        private static void RemoveUsedValueFromMask(int x, int y, int[,] mask)
         {
-            if (mask[x][y] == 0)
+            if (mask[x, y] == 0)
             {
                 return;
             }
             else
             {
-                mask[x][y] = 0;
+                mask[x, y] = 0;
 
                 var nextIndex = y + 1;
 
-                while(nextIndex < mask[x].Length && mask[x][nextIndex] != 0)
+                while (nextIndex < mask.GetLength(1) && mask[x, nextIndex] != 0)
                 {
-                    mask[x][nextIndex] = 0;
+                    mask[x, nextIndex] = 0;
                     nextIndex += 1;
                 }
 
                 var previousIndex = y - 1;
 
-                while (previousIndex >= 0 && mask[x][previousIndex] != 0)
+                while (previousIndex >= 0 && mask[x, previousIndex] != 0)
                 {
-                    mask[x][previousIndex] = 0;
+                    mask[x, previousIndex] = 0;
                     previousIndex -= 1;
                 }
             }
+        }
+    }
+
+    public class SymbolIndex
+    {
+        public int[,] Mask { get; set; }
+
+        public int Height { get; set; }
+
+        public int Width { get; set; }
+
+        public int MaxHeight { get; set; }
+
+        public int MaxWidth { get; set; }
+
+        public SymbolIndex(int[,] mask, int height, int width, int maxHeight, int maxWidth) 
+        {
+            Mask = mask;
+            Height = height;
+            Width = width;
+            MaxHeight = maxHeight;
+            MaxWidth = maxWidth;
         }
     }
 }
