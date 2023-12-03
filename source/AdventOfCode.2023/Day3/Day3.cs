@@ -22,33 +22,6 @@
             // 79026871
         }
 
-        private static int FindSymbolsAndPerformFunctionOnSurroundingValues(char[,] engineSchematic, int[,] mask, Func<SymbolIndex, int> function)
-        {
-            var sum = 0;
-
-            var height = engineSchematic.GetLength(0);
-            var width = engineSchematic.GetLength(1);
-
-            for (int x = 0; x < height; x += 1)
-            {
-                for (int y = 0; y < width; y += 1)
-                {
-                    var currentValue = engineSchematic[x, y];
-                    if (currentValue != '.'
-                        && !char.IsDigit(currentValue)
-                        && !char.IsLetter(currentValue))
-                    {
-                        var symbolIndex = new SymbolIndex(mask, x, y, height, width);
-                        var value = function(symbolIndex);
-
-                        sum += value;
-                    }
-                }
-            }
-
-            return sum;
-        }
-
         private static (char[,] engineSchematic, int[,] mask) CreateSchematicAndMask(string input)
         {
             var lines = input.Split('\n');
@@ -99,6 +72,33 @@
             {
                 mask[index.x, index.y] = value;
             }
+        }
+
+        private static int FindSymbolsAndPerformFunctionOnSurroundingValues(char[,] engineSchematic, int[,] mask, Func<SymbolIndex, int> function)
+        {
+            var sum = 0;
+
+            var height = engineSchematic.GetLength(0);
+            var width = engineSchematic.GetLength(1);
+
+            for (int x = 0; x < height; x += 1)
+            {
+                for (int y = 0; y < width; y += 1)
+                {
+                    var currentValue = engineSchematic[x, y];
+                    if (currentValue != '.'
+                        && !char.IsDigit(currentValue)
+                        && !char.IsLetter(currentValue))
+                    {
+                        var symbolIndex = new SymbolIndex(mask, x, y, height, width);
+                        var value = function(symbolIndex);
+
+                        sum += value;
+                    }
+                }
+            }
+
+            return sum;
         }
 
         private static int CalculateLocalSum(SymbolIndex symbolIndex)
