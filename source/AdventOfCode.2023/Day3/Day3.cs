@@ -105,26 +105,26 @@
         {
             int localSum = 0;
 
-            var height = symbolIndex.Height;
-            var width = symbolIndex.Width;
+            var x = symbolIndex.X;
+            var y = symbolIndex.Y;
             var maxHeight = symbolIndex.MaxHeight;
             var maxWidth = symbolIndex.MaxWidth;
             int[,] mask = symbolIndex.Mask;
 
-            var leftIndex = width - 1 >= 0 ? width - 1 : 0;
-            var rightIndex = width + 1 <= maxWidth ? width + 1 : 0;
+            var leftIndex = y - 1 >= 0 ? y - 1 : 0;
+            var rightIndex = y + 1 <= maxWidth ? y + 1 : 0;
 
-            var upIndex = height - 1 >= 0 ? height - 1 : 0;
-            var downIndex = height + 1 <= maxHeight ? height + 1 : 0;
+            var upIndex = x - 1 >= 0 ? x - 1 : 0;
+            var downIndex = x + 1 <= maxHeight ? x + 1 : 0;
 
             localSum += GetMaskIndexValueAndRemoveUsedValues(upIndex, leftIndex, mask);
-            localSum += GetMaskIndexValueAndRemoveUsedValues(upIndex, width, mask);
+            localSum += GetMaskIndexValueAndRemoveUsedValues(upIndex, y, mask);
             localSum += GetMaskIndexValueAndRemoveUsedValues(upIndex, rightIndex, mask);
-            localSum += GetMaskIndexValueAndRemoveUsedValues(height, rightIndex, mask);
+            localSum += GetMaskIndexValueAndRemoveUsedValues(x, rightIndex, mask);
             localSum += GetMaskIndexValueAndRemoveUsedValues(downIndex, rightIndex, mask);
-            localSum += GetMaskIndexValueAndRemoveUsedValues(downIndex, width, mask);
+            localSum += GetMaskIndexValueAndRemoveUsedValues(downIndex, y, mask);
             localSum += GetMaskIndexValueAndRemoveUsedValues(downIndex, leftIndex, mask);
-            localSum += GetMaskIndexValueAndRemoveUsedValues(height, leftIndex, mask);
+            localSum += GetMaskIndexValueAndRemoveUsedValues(x, leftIndex, mask);
 
             return localSum;
         }
@@ -133,26 +133,26 @@
         {
             int localSum = 0;
 
-            var height = symbolIndex.Height;
-            var width = symbolIndex.Width;
+            var x = symbolIndex.X;
+            var y = symbolIndex.Y;
             var maxHeight = symbolIndex.MaxHeight;
             var maxWidth = symbolIndex.MaxWidth;
             int[,] mask = symbolIndex.Mask;
 
-            var leftIndex = width - 1 >= 0 ? width - 1 : 0;
-            var rightIndex = width + 1 <= maxWidth ? width + 1 : 0;
+            var leftIndex = y - 1 >= 0 ? y - 1 : 0;
+            var rightIndex = y + 1 <= maxWidth ? y + 1 : 0;
 
-            var upIndex = height - 1 >= 0 ? height - 1 : 0;
-            var downIndex = height + 1 <= maxHeight ? height + 1 : 0;
+            var upIndex = x - 1 >= 0 ? x - 1 : 0;
+            var downIndex = x + 1 <= maxHeight ? x + 1 : 0;
 
             var upperLeftValue = GetMaskIndexValueAndRemoveUsedValues(upIndex, leftIndex, mask);
-            var upperValue = GetMaskIndexValueAndRemoveUsedValues(upIndex, width, mask);
+            var upperValue = GetMaskIndexValueAndRemoveUsedValues(upIndex, y, mask);
             var upperRightValue = GetMaskIndexValueAndRemoveUsedValues(upIndex, rightIndex, mask);
-            var rightValue = GetMaskIndexValueAndRemoveUsedValues(height, rightIndex, mask);
+            var rightValue = GetMaskIndexValueAndRemoveUsedValues(x, rightIndex, mask);
             var lowerRightValue = GetMaskIndexValueAndRemoveUsedValues(downIndex, rightIndex, mask);
-            var lowerValue = GetMaskIndexValueAndRemoveUsedValues(downIndex, width, mask);
+            var lowerValue = GetMaskIndexValueAndRemoveUsedValues(downIndex, y, mask);
             var lowerLeftValue = GetMaskIndexValueAndRemoveUsedValues(downIndex, leftIndex, mask);
-            var leftValue = GetMaskIndexValueAndRemoveUsedValues(height, leftIndex, mask);
+            var leftValue = GetMaskIndexValueAndRemoveUsedValues(x, leftIndex, mask);
 
             var values = new List<int> { upperLeftValue, upperValue, upperRightValue, rightValue, lowerRightValue, lowerValue, lowerLeftValue, leftValue };
 
@@ -208,19 +208,19 @@
     {
         public int[,] Mask { get; set; }
 
-        public int Height { get; set; }
+        public int X { get; set; }
 
-        public int Width { get; set; }
+        public int Y { get; set; }
 
         public int MaxHeight { get; set; }
 
         public int MaxWidth { get; set; }
 
-        public SymbolIndex(int[,] mask, int height, int width, int maxHeight, int maxWidth) 
+        public SymbolIndex(int[,] mask, int x, int y, int maxHeight, int maxWidth) 
         {
             Mask = mask;
-            Height = height;
-            Width = width;
+            X = x;
+            Y = y;
             MaxHeight = maxHeight;
             MaxWidth = maxWidth;
         }
