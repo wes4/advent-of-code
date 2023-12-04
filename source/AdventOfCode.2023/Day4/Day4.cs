@@ -38,7 +38,7 @@
             // 21213
         }
 
-        public static int Part2() 
+        public static int Part2()
         {
             var text = File.ReadAllText(@".\Day4\Day4-Data.txt");
             var lines = text.Split('\n');
@@ -55,22 +55,17 @@
 
             foreach (var game in games)
             {
-                var matches = game.WinningNumbers.Intersect(game.HeldNumbers);
-                var matchCount = matches.Count();
-
                 var gameIndex = games.IndexOf(game);
+                var numberOfWins = game.WinningNumbers.Intersect(game.HeldNumbers).Count();
+                var indexToUpdate = gameIndex + 1;
 
-                foreach (var attempt in Enumerable.Range(1, game.HeldCount + game.WinCount))
+                foreach (var win in Enumerable.Range(1, numberOfWins))
                 {
-                    var indexToUpdate = gameIndex + 1;
-                    foreach (var match in matches)
+                    if (indexToUpdate < games.Count)
                     {
-                        if (indexToUpdate < games.Count)
-                        {
-                            games[indexToUpdate].WinCount += 1;
+                        games[indexToUpdate].WinCount += (game.HeldCount + game.WinCount);
 
-                            indexToUpdate += 1;
-                        }
+                        indexToUpdate += 1;
                     }
                 }
             }
@@ -78,6 +73,47 @@
             return games.Sum(x => x.HeldCount) + games.Sum(y => y.WinCount);
             //8549735
         }
+
+        //public static int Part2()
+        //{
+        //    var text = File.ReadAllText(@".\Day4\Day4-Data.txt");
+        //    var lines = text.Split('\n');
+        //    var games = new List<Game>();
+
+        //    foreach (var line in lines)
+        //    {
+        //        if (!string.IsNullOrEmpty(line))
+        //        {
+        //            var numbers = GetNumbers(line);
+        //            games.Add(new Game(numbers.winningNumbers, numbers.heldNumbers));
+        //        }
+        //    }
+
+        //    foreach (var game in games)
+        //    {
+        //        var matches = game.WinningNumbers.Intersect(game.HeldNumbers);
+        //        var matchCount = matches.Count();
+
+        //        var gameIndex = games.IndexOf(game);
+
+        //        foreach (var attempt in Enumerable.Range(1, game.HeldCount + game.WinCount))
+        //        {
+        //            var indexToUpdate = gameIndex + 1;
+        //            foreach (var match in matches)
+        //            {
+        //                if (indexToUpdate < games.Count)
+        //                {
+        //                    games[indexToUpdate].WinCount += 1;
+
+        //                    indexToUpdate += 1;
+        //                }
+        //            }
+        //        }
+        //    }
+
+        //    return games.Sum(x => x.HeldCount) + games.Sum(y => y.WinCount);
+        //    //8549735
+        //}
 
         private static (IEnumerable<int> winningNumbers, IEnumerable<int> heldNumbers) GetNumbers(string gameString)
         {
