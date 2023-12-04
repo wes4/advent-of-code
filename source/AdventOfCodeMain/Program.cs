@@ -4,5 +4,5 @@ using AdventOfCode._2023.Day3;
 using AdventOfCode._2023.Day4;
 
 // run methods here
-var result = Day4.Part2();
-Console.WriteLine($"Day 4 Part 2 Result = {result}");
+var result = Day4.Part1();
+Console.WriteLine($"Day 4 Part 1 Result = {result}");

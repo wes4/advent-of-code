@@ -4,54 +4,27 @@
     {
         public static int Part1()
         {
-            using var fileStream = File.OpenRead(@".\Day4\Day4-Data.txt");
-            using var streamReader = new StreamReader(fileStream);
+            var games = GenerateGames(@".\Day4\Day4-Data.txt");
 
-            var totalCardSum = 0;
+            double totalCardSum = 0;
 
-            string line;
-            while ((line = streamReader.ReadLine()) != null)
+            foreach (var game in games)
             {
-                var numbers = GetNumbers(line);
+                var wins = game.WinningNumbers.Intersect(game.HeldNumbers).Count();
 
-                var localCardSum = 0;
-
-                foreach (var number in numbers.heldNumbers)
+                if (wins > 0)
                 {
-                    if (numbers.winningNumbers.Contains(number))
-                    {
-                        if (localCardSum == 0)
-                        {
-                            localCardSum += 1;
-                        }
-                        else
-                        {
-                            localCardSum *= 2;
-                        }
-                    }
+                    totalCardSum += Math.Pow(2, wins - 1);
                 }
-
-                totalCardSum += localCardSum;
             }
 
-            return totalCardSum;
+            return (int)totalCardSum;
             // 21213
         }
 
         public static int Part2()
         {
-            var text = File.ReadAllText(@".\Day4\Day4-Data.txt");
-            var lines = text.Split('\n');
-            var games = new List<Game>();
-
-            foreach (var line in lines)
-            {
-                if (!string.IsNullOrEmpty(line))
-                {
-                    var numbers = GetNumbers(line);
-                    games.Add(new Game(numbers.winningNumbers, numbers.heldNumbers));
-                }
-            }
+            var games = GenerateGames(@".\Day4\Day4-Data.txt");
 
             foreach (var game in games)
             {
@@ -71,49 +44,26 @@
             }
 
             return games.Sum(x => x.HeldCount) + games.Sum(y => y.WinCount);
-            //8549735
+            // 8549735
         }
 
-        //public static int Part2()
-        //{
-        //    var text = File.ReadAllText(@".\Day4\Day4-Data.txt");
-        //    var lines = text.Split('\n');
-        //    var games = new List<Game>();
+        private static List<Game> GenerateGames(string filepath)
+        {
+            var text = File.ReadAllText(filepath);
+            var lines = text.Split('\n');
+            var games = new List<Game>();
 
-        //    foreach (var line in lines)
-        //    {
-        //        if (!string.IsNullOrEmpty(line))
-        //        {
-        //            var numbers = GetNumbers(line);
-        //            games.Add(new Game(numbers.winningNumbers, numbers.heldNumbers));
-        //        }
-        //    }
+            foreach (var line in lines)
+            {
+                if (!string.IsNullOrEmpty(line))
+                {
+                    var numbers = GetNumbers(line);
+                    games.Add(new Game(numbers.winningNumbers, numbers.heldNumbers));
+                }
+            }
 
-        //    foreach (var game in games)
-        //    {
-        //        var matches = game.WinningNumbers.Intersect(game.HeldNumbers);
-        //        var matchCount = matches.Count();
-
-        //        var gameIndex = games.IndexOf(game);
-
-        //        foreach (var attempt in Enumerable.Range(1, game.HeldCount + game.WinCount))
-        //        {
-        //            var indexToUpdate = gameIndex + 1;
-        //            foreach (var match in matches)
-        //            {
-        //                if (indexToUpdate < games.Count)
-        //                {
-        //                    games[indexToUpdate].WinCount += 1;
-
-        //                    indexToUpdate += 1;
-        //                }
-        //            }
-        //        }
-        //    }
-
-        //    return games.Sum(x => x.HeldCount) + games.Sum(y => y.WinCount);
-        //    //8549735
-        //}
+            return games;
+        }
 
         private static (IEnumerable<int> winningNumbers, IEnumerable<int> heldNumbers) GetNumbers(string gameString)
         {
