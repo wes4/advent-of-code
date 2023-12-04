@@ -5,5 +5,4 @@ using AdventOfCode._2023.Day4;
 
 // run methods here
 var result = Day4.Part2();
-Console.WriteLine($"Day 3 Part 2 Result = {result}");
-// HIGHER 8549481
+Console.WriteLine($"Day 4 Part 2 Result = {result}");
