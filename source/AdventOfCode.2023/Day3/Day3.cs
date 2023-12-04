@@ -28,7 +28,7 @@
             var height = lines.Length;
             var width = lines[0].Length - 1; // lazy handling of not including newline characters
 
-            int x = 0, y = 0;
+            int x = 0;
             char[,] engineSchematic = new char[height, width];
             int[,] mask = new int[height, width];
             foreach (var row in input.Split('\n'))
@@ -38,7 +38,7 @@
                 bool currentlyCapturingNumber = false;
                 var trimmedRow = row.Trim().ToCharArray();
 
-                y = 0;
+                int y = 0;
                 foreach (var col in trimmedRow)
                 {
                     engineSchematic[x, y] = col;
