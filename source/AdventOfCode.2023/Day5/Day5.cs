@@ -74,7 +74,7 @@ namespace AdventOfCode._2023.Day5
 
             List<(long seedStart, long seedCount)> seeds = new List<(long seedStart, long seedCount)>(); 
 
-            var text = File.ReadAllText(@".\Day5\Day5-PartialTest.Txt");
+            var text = File.ReadAllText(@".\Day5\Day5-PartialData.Txt");
             var lines = text.Split('\n');
             for (var i = 0; i < lines.Length; i++)
             {
@@ -139,6 +139,7 @@ namespace AdventOfCode._2023.Day5
             var closestSeedDistance = ClosestLocations.Min();
 
             return closestSeedDistance;
+            // 77435348
         }
 
         private static ConcurrentBag<long> ClosestLocations = new ConcurrentBag<long>();
