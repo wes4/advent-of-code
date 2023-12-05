@@ -73,7 +73,7 @@ namespace AdventOfCode._2023.Day5
 
             List<(long seedStart, long seedCount)> seeds = new List<(long seedStart, long seedCount)>(); 
 
-            var text = File.ReadAllText(@".\Day5\Day5-TestData.Txt");
+            var text = File.ReadAllText(@".\Day5\Day5-Data.Txt");
             var lines = text.Split('\n');
             for (var i = 0; i < lines.Length; i++)
             {
@@ -121,7 +121,7 @@ namespace AdventOfCode._2023.Day5
                 }
             }
 
-            Parallel.ForEach(seeds, seed => DetermineClosestSeed(seed));
+            Parallel.ForEach(seeds, seed => IterateThroughSeedPairs(seed));
 
             var closestSeedDistance = ClosestLocations.Min();
 
@@ -134,51 +134,21 @@ namespace AdventOfCode._2023.Day5
 
         private static List<string> ConversionPath = new List<string>();
 
-        private static void DetermineClosestSeed((long seedStart, long seedCount) seeds)
+        private static void IterateThroughSeedPairs((long seedStart, long seedCount) seeds)
         {
-            var currentSeed = seeds.seedStart;
-            for (var i = 0; i < seeds.seedCount; i++)
-            {
-                var value = currentSeed;
-                foreach (var conversionName in ConversionPath)
-                {
-                    var converter = Maps.FirstOrDefault(map => map.To == conversionName);
-                    value = converter.Convert(value);
-                }
-
-                ClosestLocations.Add(value);
-                currentSeed += 1;
-            }
+            Parallel.For(0, seeds.seedCount, index => ConvertEachSeed(index + seeds.seedStart));
         }
 
-        //private static void DetermineClosestSeed(long seed)
-        //{
-        //    try
-        //    {
-        //        var value = seed;
-        //        foreach (var conversionName in ConversionPath)
-        //        {
-        //            var converter = Maps.FirstOrDefault(map => map.To == conversionName);
-        //            value = converter.Convert(value);
-        //        }
-
-        //        ClosestLocations.Add(value);
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        var foo = 1;
-        //    }
-        //}
-
-        private static IEnumerable<long> CreateRange(long start, long count)
+        private static void ConvertEachSeed(long seed)
         {
-            var limit = start + count;
-
-            while (start < limit)
+            var value = seed;
+            foreach (var conversionName in ConversionPath)
             {
-                yield return start;
-                start++;
+                var converter = Maps.FirstOrDefault(map => map.To == conversionName);
+                value = converter.Convert(value);
             }
+
+            ClosestLocations.Add(value);
         }
 
         private class Map
