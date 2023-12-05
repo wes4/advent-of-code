@@ -1,4 +1,7 @@
-﻿namespace AdventOfCode._2023.Day5
+﻿using System;
+using System.Collections.Concurrent;
+
+namespace AdventOfCode._2023.Day5
 {
     public static class Day5
     {
@@ -62,6 +65,120 @@
             }
 
             return closestLocation;
+        }
+
+        public static long Part2()
+        {
+            List<string> conversionPath = new List<string>();
+
+            List<(long seedStart, long seedCount)> seeds = new List<(long seedStart, long seedCount)>(); 
+
+            var text = File.ReadAllText(@".\Day5\Day5-TestData.Txt");
+            var lines = text.Split('\n');
+            for (var i = 0; i < lines.Length; i++)
+            {
+                var currentLine = lines[i];
+                if (currentLine.Contains("seeds:"))
+                {
+                    var seedsValues = currentLine.Split(":")[1].Trim().Split(" ").Select(x => long.Parse(x)).ToList();
+                    for (int j = 0; j < seedsValues.Count(); j += 2)
+                    {
+                        if (j + 1 < seedsValues.Count())
+                        {
+                            var seedsStart = seedsValues[j];
+                            var seedsCount = seedsValues[j + 1];
+
+                            seeds.Add((seedsStart, seedsCount));
+                        }
+                    }
+                }
+
+                if (currentLine.Contains("-to-"))
+                {
+                    var mapWords = currentLine.Split("-");
+                    var fromMap = mapWords[0];
+                    var toMap = mapWords[2].Split(" ")[0];
+                    ConversionPath.Add(toMap);
+
+                    var checkIndex = i + 1;
+
+                    var mapValues = new List<(long destination, long source, long range)>();
+
+                    while (checkIndex < lines.Length && !(lines[checkIndex].Length == 1 && lines[checkIndex].Contains('\r')))
+                    {
+                        var mapString = lines[checkIndex].Split(" ");
+                        var destinationRangeStart = long.Parse(mapString[0]);
+                        var sourceRangeStart = long.Parse(mapString[1]);
+                        var rangeLength = long.Parse(mapString[2]);
+                        mapValues.Add((destinationRangeStart, sourceRangeStart, rangeLength));
+                        checkIndex += 1;
+                    }
+
+                    var sources = mapValues.Select(x => x.source).ToList();
+                    var destinations = mapValues.Select(x => x.destination).ToList();
+                    var ranges = mapValues.Select(x => x.range).ToList();
+                    Maps.Add(new Map(fromMap, toMap, sources, destinations, ranges));
+                }
+            }
+
+            Parallel.ForEach(seeds, seed => DetermineClosestSeed(seed));
+
+            var closestSeedDistance = ClosestLocations.Min();
+
+            return closestSeedDistance;
+        }
+
+        private static ConcurrentBag<long> ClosestLocations = new ConcurrentBag<long>();
+
+        private static List<Map> Maps = new List<Map>();
+
+        private static List<string> ConversionPath = new List<string>();
+
+        private static void DetermineClosestSeed((long seedStart, long seedCount) seeds)
+        {
+            var currentSeed = seeds.seedStart;
+            for (var i = 0; i < seeds.seedCount; i++)
+            {
+                var value = currentSeed;
+                foreach (var conversionName in ConversionPath)
+                {
+                    var converter = Maps.FirstOrDefault(map => map.To == conversionName);
+                    value = converter.Convert(value);
+                }
+
+                ClosestLocations.Add(value);
+                currentSeed += 1;
+            }
+        }
+
+        //private static void DetermineClosestSeed(long seed)
+        //{
+        //    try
+        //    {
+        //        var value = seed;
+        //        foreach (var conversionName in ConversionPath)
+        //        {
+        //            var converter = Maps.FirstOrDefault(map => map.To == conversionName);
+        //            value = converter.Convert(value);
+        //        }
+
+        //        ClosestLocations.Add(value);
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        var foo = 1;
+        //    }
+        //}
+
+        private static IEnumerable<long> CreateRange(long start, long count)
+        {
+            var limit = start + count;
+
+            while (start < limit)
+            {
+                yield return start;
+                start++;
+            }
         }
 
         private class Map
