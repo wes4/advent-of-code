@@ -69,6 +69,7 @@ namespace AdventOfCode._2023.Day5
 
         public static long Part2()
         {
+            var startTime = DateTime.Now;
             List<string> conversionPath = new List<string>();
 
             List<(long seedStart, long seedCount)> seeds = new List<(long seedStart, long seedCount)>(); 
@@ -121,8 +122,17 @@ namespace AdventOfCode._2023.Day5
                 }
             }
 
-            Parallel.ForEach(seeds, seed => IterateThroughSeedPairs(seed));
-
+            try
+            {
+                Parallel.ForEach(seeds, seed => IterateThroughSeedPairs(seed));
+            }
+            catch (Exception e)
+            {
+                var errorTime = DateTime.Now;
+                var runTime = DateTime.Now - startTime;
+                var foo = 1;
+            }
+            
             var closestSeedDistance = ClosestLocations.Min();
 
             return closestSeedDistance;
