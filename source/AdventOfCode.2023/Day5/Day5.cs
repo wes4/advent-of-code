@@ -74,7 +74,7 @@ namespace AdventOfCode._2023.Day5
 
             List<(long seedStart, long seedCount)> seeds = new List<(long seedStart, long seedCount)>(); 
 
-            var text = File.ReadAllText(@".\Day5\Day5-Data.Txt");
+            var text = File.ReadAllText(@".\Day5\Day5-PartialTest.Txt");
             var lines = text.Split('\n');
             for (var i = 0; i < lines.Length; i++)
             {
@@ -129,9 +129,12 @@ namespace AdventOfCode._2023.Day5
             catch (Exception e)
             {
                 var errorTime = DateTime.Now;
-                var runTime = DateTime.Now - startTime;
+                var errorRunTime = DateTime.Now - startTime;
+                var currentClosestSeedDistance = ClosestLocations.Min();
                 var foo = 1;
             }
+
+            var runTime = DateTime.Now - startTime;
             
             var closestSeedDistance = ClosestLocations.Min();
 
@@ -147,6 +150,8 @@ namespace AdventOfCode._2023.Day5
         private static void IterateThroughSeedPairs((long seedStart, long seedCount) seeds)
         {
             Parallel.For(0, seeds.seedCount, index => ConvertEachSeed(index + seeds.seedStart));
+            Console.WriteLine($"Completed seed pair starting with {seeds.seedStart}");
+            Console.WriteLine($"Current shortest location =  {ClosestLocations.Min()}");
         }
 
         private static void ConvertEachSeed(long seed)
